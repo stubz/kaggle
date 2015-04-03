@@ -5,7 +5,7 @@ testing  <- read.csv("test.csv")
 # 93 features, 9 classes.
 # The objective is to build a model that can classifly Class1 - Class9 from 93 features
 head(trainingall)
-summary(training)
+summary(trainingall)
 # we don't have any missing values
 any(is.na(trainingall)) 
 any(is.na(testing)) 
