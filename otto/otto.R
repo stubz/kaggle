@@ -1,4 +1,5 @@
 setwd("/Users/okada/myWork/kaggle/otto/")
+library(corrplot)
 trainingall <- read.csv("train.csv")
 testing  <- read.csv("test.csv")
 
@@ -9,6 +10,16 @@ summary(trainingall)
 # we don't have any missing values
 any(is.na(trainingall)) 
 any(is.na(testing)) 
+
+tmp.dat <- subset(trainingall, select=-c(id,target))
+descrCor <- cor(tmp.dat)
+highlyCor <- findCorrelation(descrCor,cutoff=0.50) # correlatin filter at 0.7
+colnames(tmp.dat)[highlyCor]
+findLinearCombos(tmp.dat)
+corrplot(descrCor, order="hclust")
+corrplot(cor(tmp.dat[, highlyCor]), order="hclust")
+
+
 
 ## basic random forest
 library(caret)
@@ -35,6 +46,7 @@ plot(varImp (modFitRF, scale = FALSE), top = 20)
 trellis.par.set(caretTheme())
 plot (modFitRF, type = c("g", "o"))
 save(modFitRF, file="modFitRF.RData")
+load("modFitRF.RData")
 
 predrf.test <- predict(modFitRF, testing)
 cls1 <- ifelse(predrf.test=="Class_1", 1, 0)
@@ -57,8 +69,11 @@ write.csv(submission.rf, file="submission_rf.csv", row.names=FALSE, quote=FALSE)
 #########
 ## GBM ##
 #########
+library(doMC)
+registerDoMC(cores=4)
+before <- proc.time()
 modFitGBM <- train(target~., data=training, method="gbm",trControl = control)
-print(modFitGBM)
+proc.time() - before
 summary(modFitGBM$finalModel)
 predGBM <- predict(modFitGBM, cv)
 confusionMatrix(predGBM, cv$classe)
@@ -71,15 +86,15 @@ plot(varImp (modFitGBM, scale = FALSE), top = 20)
 ###########
 ## LASSO ##
 ###########
-library(caret)
-library(doMC)
-registerDoMC(cores=4)
-before <- proc.time()
-modFitSVMLn <- train(target~., data=training, method="lasso", trControl = control)
-proc.time() - before
-predLasso <- predict(modFitLasso, cv)
-confusionMatrix(predLasso, cv$target)
-save(modFitLasso, file="modFitLasso.RData")
+#library(caret)
+#library(doMC)
+#registerDoMC(cores=4)
+#before <- proc.time()
+#modFitLasso <- train(target~., data=training, method="lasso", trControl = control)
+#proc.time() - before
+#predLasso <- predict(modFitLasso, cv)
+#confusionMatrix(predLasso, cv$target)
+#save(modFitLasso, file="modFitLasso.RData")
 
 ###########
 ## SVM ##
@@ -94,4 +109,26 @@ proc.time() - before
 predsvmln <- predict(modFitSVMLn, cv)
 confusionMatrix(predsvmln, cv$target)
 save(modFitSVMLn, file="modFitSVMLn.RData")
+
+#
+before <- proc.time()
+modFitSVMRad <- train(target~., data=training, method="svmRadial", trControl = control)
+proc.time() - before
+
+predsvmrad <- predict(modFitSVMRad, cv)
+confusionMatrix(predsvmrad, cv$target)
+#  Accuracy : 0.7872
+# 95% CI : (0.7799, 0.7944)
+save(modFitSVMRad, file="modFitSVMRad.RData")
+
+## Polinomial
+before <- proc.time()
+modFitSVMPoly <- train(target~., data=training, method="svmPoly", trControl = control)
+proc.time() - before
+
+predsvmpoly <- predict(modFitSVMPoly, cv)
+confusionMatrix(predsvmpoly, cv$target)
+# Accuracy : 0.7872
+save(modFitSVMPoly, file="modFitSVMPoly.RData")
+
 
