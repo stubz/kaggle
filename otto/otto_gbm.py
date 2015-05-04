@@ -52,7 +52,7 @@ if __name__ == "__main__":
     ### Modelling by Random Forest with parameter tuning
     ##################################################################
     # build a classifier
-    clf = GradientBoostingClassifier(n_jobs=-1)
+    clf = GradientBoostingClassifier()
 
     # specify parameters and distributions to sample from
     param_dist = {"max_depth": [3, None],
@@ -63,7 +63,7 @@ if __name__ == "__main__":
 
     # run randomized search
     n_iter_search = 20
-    random_search = RandomizedSearchCV(clf, param_distributions=param_dist,
+    random_search = RandomizedSearchCV(clf, param_distributions=param_dist, n_jobs=-1,
                                    n_iter=n_iter_search)
     start = time()
     random_search.fit(X, y)
@@ -73,7 +73,7 @@ if __name__ == "__main__":
 
     # predict on test set
     params = random_search.best_params_
-    clf = GradientBoostingClassifier(n_jobs=-1, max_depth=params['max_depth'], max_features=params['max_features'],
+    clf = GradientBoostingClassifier( max_depth=params['max_depth'], max_features=params['max_features'],
                                      min_samples_split=params['min_samples_split'], min_samples_leaf=params['min_samples_leaf'], n_estimators=params['n_estimators'])
     # save the model
     clf.fit(X_train, y_train)
