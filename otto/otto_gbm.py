@@ -72,9 +72,22 @@ if __name__ == "__main__":
     report(random_search.grid_scores_)
 
     # predict on test set
-    preds = random_search.predict_proba(X_test)
+    params = random_search.best_params_
+    clf = RandomForestClassifier(n_jobs=-1, max_depth=params['max_depth'], max_features=params['max_features'],
+                                     min_samples_split=params['min_samples_split'], min_samples_leaf=params['min_samples_leaf'], n_estimators=params['n_estimators'])
+    # save the model
+    clf.fit(X_train, y_train)
+    joblib.dump(clf, './model_gbm/model_gbm')
+    preds = clf.predict_proba(X_test)
+    preds_class = clf.predict(X_test)
+    # check performance
+    print classification_report(y_test, preds_class)
+    confusion_matrix(y_test, preds_class)
 
+    ############################
+    # Predict the test data set
+    ############################
+    pred_test = clf.predict_proba(data_test)
     # create submission file
-    preds = pd.DataFrame(preds, index=sample.id.values, columns=sample.columns[1:])
-    preds.to_csv('submission_gbm_tfidf.csv', index_label='id')
-
+    pred_test_tbl = pd.DataFrame(pred_test, index=sample.id.values, columns=sample.columns[1:])
+    pred_test_tbl.to_csv('submission_gbm_tfidf.csv', index_label='id')
