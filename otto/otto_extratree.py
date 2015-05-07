@@ -13,6 +13,7 @@ from scipy.stats import expon
 from time import time
 from operator import itemgetter
 from scipy.stats import randint as sp_randint
+import joblib
 
 # Utility function to report best scores
 def report(grid_scores, n_top=3):
@@ -84,8 +85,9 @@ if __name__ == "__main__":
     preds = clf.predict_proba(X_test)
     preds_class = clf.predict(X_test)
     # check performance
+    print clf
     print classification_report(y_test, preds_class)
-    confusion_matrix(y_test, preds_class)
+    print confusion_matrix(y_test, preds_class)
 
     ############################
     # Predict the test data set
