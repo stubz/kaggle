@@ -40,7 +40,7 @@ if __name__ == "__main__":
     # standardising the data 
     # X = StandardScaler().fit_transform(X)
     tfidf = feature_extraction.text.TfidfTransformer()
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.4)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.2)
     #X_train = tfidf.fit_transform(X_train).toarray()
     #X_test = tfidf.fit_transform(X_test).toarray()
 
@@ -54,7 +54,7 @@ if __name__ == "__main__":
     ### Modelling by Random Forest with parameter tuning
     ##################################################################
     # build a classifier
-    clf = ExtraTreesClassifier(n_estimators=100, max_features='auto', max_depth=None, min_samples_split=1, random_state=0, n_jobs=-1)
+    clf = ExtraTreesClassifier(n_estimators=500, max_features='auto', max_depth=None, min_samples_split=1, random_state=0, n_jobs=-1)
 
     # specify parameters and distributions to sample from
     """
