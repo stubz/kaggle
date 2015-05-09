@@ -53,32 +53,27 @@ if __name__ == "__main__":
     ##################################################################
     ### Modelling by Random Forest with parameter tuning
     ##################################################################
-    # build a classifier
-    clf = ExtraTreesClassifier(n_estimators=500, max_features='auto', max_depth=None, min_samples_split=1, random_state=0, n_jobs=-1)
+    clf = ExtraTreesClassifier()
 
     # specify parameters and distributions to sample from
-    """
-    param_dist = {"max_depth": [3, None],
-                  "max_features": sp_randint(1, 30),
-                  "min_samples_split": sp_randint(1, 11),
-                  "min_samples_leaf": sp_randint(1, 11),
-                  "n_estimators": sp_randint(1, 1000),}
+    param_dist = { "n_estimators": [100,1000,2000,10000],
+        "max_features":['auto',10,50]}
 
     # run randomized search
     n_iter_search = 20
-    random_search = RandomizedSearchCV(clf, param_distributions=param_dist, n_jobs=-1,
-                                   n_iter=n_iter_search)
+    random_search = GridSearchCV(clf, param_grid=param_dist, n_jobs=-1)
+    #random_search = RandomizedSearchCV(clf, param_distributions=param_dist, n_jobs=-1,
+    #                               n_iter=n_iter_search)
     start = time()
     random_search.fit(X, y)
-    print("RandomizedSearchCV took %.2f seconds for %d candidates"
+    print("GridSearchCV took %.2f seconds for %d candidates"
       " parameter settings." % ((time() - start), n_iter_search))
     report(random_search.grid_scores_)
 
     # predict on test set
     params = random_search.best_params_
-    clf = GradientBoostingClassifier( max_depth=params['max_depth'], max_features=params['max_features'],
-                                     min_samples_split=params['min_samples_split'], min_samples_leaf=params['min_samples_leaf'], n_estimators=params['n_estimators'])
-    """
+    clf = ExtraTreesClassifier(n_estimators=params['n_estimators'], max_features=params['max_features'])
+
     clf.fit(X_train, y_train)
     # save the model
     joblib.dump(clf, './model_extratree/model_extratree')
@@ -96,3 +91,4 @@ if __name__ == "__main__":
     # create submission file
     pred_test_tbl = pd.DataFrame(pred_test, index=sample.id.values, columns=sample.columns[1:])
     pred_test_tbl.to_csv('submission_extratree.csv', index_label='id')
+
