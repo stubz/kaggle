@@ -45,9 +45,9 @@ if __name__ == "__main__":
     #X_test = tfidf.fit_transform(X_test).toarray()
 
     """
-    X_train = X_train[:1000]
+    X_train = X_train[:500]
     X_test = X_test[:100]
-    y_train = y_train[:1000]
+    y_train = y_train[:500]
     y_test = y_test[:100]
     """
     ##################################################################
@@ -65,7 +65,7 @@ if __name__ == "__main__":
     #random_search = RandomizedSearchCV(clf, param_distributions=param_dist, n_jobs=-1,
     #                               n_iter=n_iter_search)
     start = time()
-    random_search.fit(X, y)
+    random_search.fit(X_train, y_train)
     print("GridSearchCV took %.2f seconds for %d candidates"
       " parameter settings." % ((time() - start), n_iter_search))
     report(random_search.grid_scores_)
